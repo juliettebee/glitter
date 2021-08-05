@@ -26,3 +26,6 @@ gitserv-*.tar
 /tmp/
 
 g/*
+!g/.gitkeep
+
+.DS_Store
