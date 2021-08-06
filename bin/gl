@@ -1,0 +1,63 @@
+#!/bin/bash
+
+help() {
+    echo "Glitter"
+    echo "gl new [repo name] - Create repo"
+    echo "gl init - Create repo from current folder name, init git and add remote"
+    echo "gl rm [repo name] - Delete repo"
+    echo "gl server [server url] - Add server"
+}
+
+server() {
+    mkdir -p ~/.config/glitter
+    touch ~/.config/glitter/server
+    echo $arg > ~/.config/glitter/server
+    echo "Done!"
+}
+
+new() {
+    server=`cat ~/.config/glitter/server`
+    echo $server
+    curl -s -X POST "$server/a/new?name=$2" > /dev/null
+    echo "Done!"
+}
+
+init() {
+    echo "Creating git repo.."
+    server=`cat ~/.config/glitter/server`
+    folder=${PWD##*/}
+    curl -s -X POST "$server/a/new?name=$folder" > /dev/null
+    echo "Created repo"
+    echo "Initing git and adding remote as local.."
+    git init . > /dev/null
+    git remote add local "$server/g/$pwd" > /dev/null
+    echo "Done!"
+}
+
+rm() {
+    server=`cat ~/.config/glitter/server`
+    curl -s -X POST "$server/a/rm?name=$arg" > /dev/null
+    echo "Done!"
+}
+
+case "$1" in
+    new)
+        export arg=$2
+        new
+        ;;
+    init)
+        export arg=$2
+        init
+        ;;
+    rm)
+        export arg=$2
+        rm
+        ;;
+    server)
+        export arg=$2
+        server
+        ;;
+    *)
+        help
+        ;;
+esac
